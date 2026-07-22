@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const authRoutes = require("./routes/auth.routes.js");
 const cors = require("cors")
+const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 require('./config/passport'); // Initialize passport strategy
@@ -20,6 +21,7 @@ app.use(cors({
 
 app.use("/api/auth", authRoutes);
 
+app.use('/api', uploadRoutes);
 
 
 module.exports = app;
