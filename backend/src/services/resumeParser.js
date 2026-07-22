@@ -10,7 +10,7 @@ const extractTextFromPDF = async (fileBuffer) => {
         throw new Error('Failed to parse PDF: ' + error.message);
     } finally {
         if (parser) {
-            await parser.destroy();
+            parser.destroy();
         }
     }
 };
