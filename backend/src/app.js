@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const authRoutes = require("./routes/auth.routes.js");
 const cors = require("cors")
 const uploadRoutes = require('./routes/uploadRoutes');
+const portfolioRoutes = require('./routes/portfolioRoutes');
 
 const app = express();
 require('./config/passport'); // Initialize passport strategy
@@ -22,6 +23,8 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 
 app.use('/api', uploadRoutes);
+
+app.use('/api', portfolioRoutes);
 
 
 module.exports = app;

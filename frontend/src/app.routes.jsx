@@ -3,6 +3,7 @@ import Register from "./features/auth/pages/Register";
 import Login from "./features/auth/pages/Login";
 import Protected from "./features/auth/components/Protected";
 import Home from "./Home";
+import PortfolioPage from "./pages/PortfolioPage";
 
 export const router = createBrowserRouter([
     {
@@ -16,6 +17,10 @@ export const router = createBrowserRouter([
     {
         path: "/login",
         element: <Login />
+    },
+    {
+        path: "/portfolio/:slug",        // ADD THIS
+        element: <PortfolioPage />         // no <Protected> wrapper — public route
     }
 ])
 
