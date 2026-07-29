@@ -1,6 +1,6 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
-import TemplateOne from '../templates/TemplateOne';
+import { templates } from '../templates';
 
 function PortfolioPage() {
     const { slug } = useParams();
@@ -28,7 +28,11 @@ function PortfolioPage() {
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
-    return <TemplateOne portfolio={portfolio} />;
+    const SelectedTemplate = portfolio
+        ? (templates[portfolio.selectedTemplate] || templates.TemplateOne)
+        : templates.TemplateOne;
+
+    return <SelectedTemplate portfolio={portfolio} />;
 }
 
 export default PortfolioPage;

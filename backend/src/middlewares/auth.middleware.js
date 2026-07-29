@@ -4,7 +4,14 @@ const jwt = require('jsonwebtoken');
 const { redis } = require('../config/cache');
 
 async function authUser(req, res, next) {
-    const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+    let token = req.cookies?.token;
+
+    if (!token && req.headers.authorization) {
+        const headerToken = req.headers.authorization.split(' ')[1];
+        if (headerToken && headerToken !== 'null' && headerToken !== 'undefined') {
+            token = headerToken;
+        }
+    }
 
     if (!token) {
         return res.status(401).json({

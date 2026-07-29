@@ -7,14 +7,14 @@ const { redis } = require('../config/cache');
 async function registerUser(req, res) {
     const { username, email, password } = req.body;
 
-    const isAlreadyReggistered = await userModel.findOne({
+    const isAlreadyRegistered = await userModel.findOne({
         $or: [
             { email },
             { username }
         ]
     })
 
-    if (isAlreadyReggistered) {
+    if (isAlreadyRegistered) {
         return res.status(400).json({ message: "User already registered" });
     }
 
@@ -128,7 +128,7 @@ async function googleCallback(req, res) {
     }, process.env.JWT_SECRET, {
         expiresIn: "3d"
     });
-    
+
     res.cookie("token", token);
 
     // Redirect back to frontend

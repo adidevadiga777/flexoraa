@@ -5,6 +5,7 @@ const authRoutes = require("./routes/auth.routes.js");
 const cors = require("cors")
 const uploadRoutes = require('./routes/uploadRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 const app = express();
 require('./config/passport'); // Initialize passport strategy
@@ -25,6 +26,8 @@ app.use("/api/auth", authRoutes);
 app.use('/api', uploadRoutes);
 
 app.use('/api', portfolioRoutes);
+
+app.use('/api/payment', paymentRoutes);
 
 
 module.exports = app;

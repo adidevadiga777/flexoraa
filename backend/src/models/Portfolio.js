@@ -8,8 +8,9 @@ const portfolioSchema = new mongoose.Schema({
     },
     slug: {
         type: String,
-        required: true,
-        unique: true
+        unique: true,
+        sparse: true,
+        default: null  // null until paid
     },
     structuredData: {
         type: Object,
@@ -25,8 +26,27 @@ const portfolioSchema = new mongoose.Schema({
     },
     selectedTemplate: {
         type: String,
+        enum: ['TemplateOne', 'TemplateTwo'],
         default: 'TemplateOne'
     },
+    isPaid: {
+        type: Boolean,
+        default: false
+    },
+    paymentId: {
+        type: String,
+        default: null
+    },
+    isPublished: {
+        type: Boolean,
+        default: false
+    },
+    messages: [
+        {
+            role: { type: String },
+            text: { type: String }
+        }
+    ],
     createdAt: {
         type: Date,
         default: Date.now
