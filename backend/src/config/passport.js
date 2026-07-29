@@ -8,7 +8,7 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.GOOGLE_CALLBACK_URL,
+            callbackURL: process.env.GOOGLE_CALLBACK_URL || 'https://flexoraa-1.onrender.com/api/auth/google/callback',
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
