@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import { API_BASE_URL } from '../config';
 
 function PaymentPage() {
     const location = useLocation();
@@ -29,7 +30,7 @@ function PaymentPage() {
     const handleGoLive = async () => {
         setIsPublishing(true);
         try {
-            const orderRes = await fetch('http://localhost:3000/api/payment/create-order', {
+            const orderRes = await fetch(`${API_BASE_URL}/api/payment/create-order`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
@@ -65,7 +66,7 @@ function PaymentPage() {
                 order_id: orderData.orderId,
                 handler: async function (response) {
                     try {
-                        const verifyRes = await fetch('http://localhost:3000/api/payment/verify', {
+                        const verifyRes = await fetch(`${API_BASE_URL}/api/payment/verify`, {
                             method: 'POST', credentials: 'include',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ portfolioId: portfolio._id, ...response })

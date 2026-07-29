@@ -5,6 +5,7 @@ import { Maximize2, Minimize2, Globe, Copy, Check, Loader2 } from 'lucide-react'
 import { templates } from './templates';
 import Navbar from './components/Navbar';
 import GeneratingIndicator from './components/GeneratingIndicator';
+import { API_BASE_URL } from './config';
 
 function Home() {
     const [resume, setResume] = useState(null);
@@ -55,7 +56,7 @@ function Home() {
 
         const fetchSavedPortfolio = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/portfolio/me', {
+                const response = await fetch(`${API_BASE_URL}/api/portfolio/me`, {
                     credentials: 'include'
                 });
                 if (response.ok) {
@@ -63,7 +64,7 @@ function Home() {
                     if (data.portfolio) {
                         setPortfolio(data.portfolio);
                         if (data.portfolio.isPublished && data.portfolio.slug) {
-                            setLiveUrl(`http://localhost:5173/portfolio/${data.portfolio.slug}`);
+                            setLiveUrl(`${window.location.origin}/portfolio/${data.portfolio.slug}`);
                         }
                         if (data.portfolio.messages && data.portfolio.messages.length > 0) {
                             setMessages(data.portfolio.messages);
@@ -95,7 +96,7 @@ function Home() {
         setShowChatsModal(true);
         setLoadingChats(true);
         try {
-            const response = await fetch('http://localhost:3000/api/portfolio/all', {
+            const response = await fetch(`${API_BASE_URL}/api/portfolio/all`, {
                 credentials: 'include'
             });
             if (response.ok) {
@@ -112,7 +113,7 @@ function Home() {
     const handleSelectPortfolioFromChats = (selectedPortfolio) => {
         setPortfolio(selectedPortfolio);
         if (selectedPortfolio.isPublished && selectedPortfolio.slug) {
-            setLiveUrl(`http://localhost:5173/portfolio/${selectedPortfolio.slug}`);
+            setLiveUrl(`${window.location.origin}/portfolio/${selectedPortfolio.slug}`);
         } else {
             setLiveUrl(null);
         }
@@ -128,7 +129,7 @@ function Home() {
         e.stopPropagation();
         if (!window.confirm('Are you sure you want to delete this portfolio chat?')) return;
         try {
-            const res = await fetch(`http://localhost:3000/api/portfolio/${portfolioId}`, {
+            const res = await fetch(`${API_BASE_URL}/api/portfolio/${portfolioId}`, {
                 method: 'DELETE',
                 credentials: 'include'
             });
@@ -155,7 +156,7 @@ function Home() {
                 formData.append('instruction', chatInput.trim());
             }
             try {
-                const response = await fetch('http://localhost:3000/api/upload', {
+                const response = await fetch(`${API_BASE_URL}/api/upload`, {
                     method: 'POST',
                     credentials: 'include',
                     body: formData
@@ -165,7 +166,7 @@ function Home() {
                     setPortfolio(data.portfolio);
                     setChatInput('');
                     if (data.portfolio.isPublished && data.portfolio.slug) {
-                        setLiveUrl(`http://localhost:5173/portfolio/${data.portfolio.slug}`);
+                        setLiveUrl(`${window.location.origin}/portfolio/${data.portfolio.slug}`);
                     }
                     if (data.portfolio.messages && data.portfolio.messages.length > 0) {
                         setMessages(data.portfolio.messages);
@@ -185,7 +186,7 @@ function Home() {
             setChatInput('');
             setLoading(true);
             try {
-                const response = await fetch(`http://localhost:3000/api/portfolio/${portfolio._id}/edit`, {
+                const response = await fetch(`${API_BASE_URL}/api/portfolio/${portfolio._id}/edit`, {
                     method: 'PATCH',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },

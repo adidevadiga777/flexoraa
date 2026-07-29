@@ -163,9 +163,8 @@ const publishPortfolio = async (req, res) => {
         }
 
         portfolio.isPublished = true;
-        await portfolio.save();
-
-        const liveUrl = `http://localhost:5173/portfolio/${portfolio.slug}`;
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const liveUrl = `${frontendUrl}/portfolio/${portfolio.slug}`;
         res.status(200).json({ message: 'Portfolio published successfully', portfolio, liveUrl });
 
     } catch (error) {

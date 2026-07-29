@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
+import { API_BASE_URL } from '../../../config';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -118,7 +119,7 @@ const Register = () => {
 
                         {/* Google */}
                         <a
-                            href="http://localhost:3000/api/auth/google"
+                            href={`${API_BASE_URL}/api/auth/google`}
                             className="flex items-center justify-center gap-3 w-full border border-[#d4d0cb] rounded-lg py-2.5 text-[14px] font-medium text-[#1a1a1a] bg-white hover:bg-[#f0ece6] transition-colors mb-4"
                         >
                             <svg width="18" height="18" viewBox="0 0 24 24">

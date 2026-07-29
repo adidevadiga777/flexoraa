@@ -10,8 +10,10 @@ router.post('/login', authController.loginUser)
 router.get("/get-me", authMiddleware.authUser, authController.getMe)
 router.get("/logout", authMiddleware.authUser, authController.logoutUser)
 
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 // Google OAuth routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
-router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: 'http://localhost:5173/login' }), authController.googleCallback)
+router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: `${frontendUrl}/login` }), authController.googleCallback)
 
 module.exports = router;

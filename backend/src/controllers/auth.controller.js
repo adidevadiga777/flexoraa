@@ -132,7 +132,8 @@ async function googleCallback(req, res) {
     res.cookie("token", token);
 
     // Redirect back to frontend
-    res.redirect("http://localhost:5173/");
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    res.redirect(`${frontendUrl}/`);
 }
 
 module.exports = {

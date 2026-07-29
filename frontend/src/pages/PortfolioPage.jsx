@@ -1,6 +1,7 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import { templates } from '../templates';
+import { API_BASE_URL } from '../config';
 
 function PortfolioPage() {
     const { slug } = useParams();
@@ -11,7 +12,7 @@ function PortfolioPage() {
     useEffect(() => {
         const fetchPortfolio = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/portfolio/${slug}`);
+                const response = await fetch(`${API_BASE_URL}/api/portfolio/${slug}`);
                 if (!response.ok) throw new Error('Portfolio not found');
                 const data = await response.json();
                 setPortfolio(data.portfolio);
