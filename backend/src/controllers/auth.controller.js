@@ -4,6 +4,13 @@ const jwt = require('jsonwebtoken')
 const blacklistModel = require('../models/blacklist.model')
 const { redis } = require('../config/cache');
 
+const getCookieOptions = () => ({
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    maxAge: 3 * 24 * 60 * 60 * 1000
+});
+
 async function registerUser(req, res) {
     const { username, email, password } = req.body;
 
@@ -17,7 +24,6 @@ async function registerUser(req, res) {
     if (isAlreadyRegistered) {
         return res.status(400).json({ message: "User already registered" });
     }
-
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -33,17 +39,18 @@ async function registerUser(req, res) {
     }, process.env.JWT_SECRET, {
         expiresIn: "3d"
     })
-    res.cookie("token", token)
+
+    res.cookie("token", token, getCookieOptions())
 
     return res.status(200).json({
         message: "User registered successfully",
+        token,
         user: {
             id: user._id,
             username: user.username,
             email: user.email
         }
     });
-
 }
 
 async function loginUser(req, res) {
@@ -79,17 +86,18 @@ async function loginUser(req, res) {
     }, process.env.JWT_SECRET, {
         expiresIn: "3d"
     })
-    res.cookie("token", token)
+
+    res.cookie("token", token, getCookieOptions())
 
     return res.status(200).json({
         message: "User logged in successfully",
+        token,
         user: {
             id: user._id,
             username: user.username,
             email: user.email
         }
     });
-
 }
 
 async function getMe(req, res) {
@@ -107,12 +115,17 @@ async function getMe(req, res) {
 }
 
 async function logoutUser(req, res) {
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
-    const token = req.cookies.token
+    res.clearCookie("token", getCookieOptions())
 
-    res.clearCookie("token")
-
-    await redis.set(token, Date.now().toString(), "EX", 60 * 60)
+    if (token) {
+        try {
+            await redis.set(token, Date.now().toString(), "EX", 60 * 60);
+        } catch (e) {
+            console.error("Redis logout error:", e.message);
+        }
+    }
 
     return res.status(200).json({
         message: "User logged out successfully"
@@ -129,13 +142,13 @@ async function googleCallback(req, res) {
         expiresIn: "3d"
     });
 
-    res.cookie("token", token);
+    res.cookie("token", token, getCookieOptions());
 
-    // Redirect back to frontend
+    // Redirect back to frontend with token parameter for fallback
     const frontendUrl = (process.env.FRONTEND_URL && !process.env.FRONTEND_URL.includes('localhost'))
         ? process.env.FRONTEND_URL
         : "https://flexoraa-lovat.vercel.app";
-    res.redirect(`${frontendUrl}/`);
+    res.redirect(`${frontendUrl}/?token=${token}`);
 }
 
 module.exports = {

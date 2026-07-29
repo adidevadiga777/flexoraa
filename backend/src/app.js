@@ -8,7 +8,6 @@ const portfolioRoutes = require('./routes/portfolioRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 
 const app = express();
-app.set('trust proxy', 1);
 require('./config/passport'); // Initialize passport strategy
 
 // Middleware
@@ -19,7 +18,7 @@ app.use(morgan('dev'));
 const allowedOrigins = [
     process.env.FRONTEND_URL,
     "https://flexoraa-lovat.vercel.app",
-    "http://localhost:5173",
+    "http://localhost:5173"
 
 ].filter(Boolean);
 
