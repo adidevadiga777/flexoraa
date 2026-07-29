@@ -8,6 +8,7 @@ const portfolioRoutes = require('./routes/portfolioRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 
 const app = express();
+app.set('trust proxy', 1);
 require('./config/passport'); // Initialize passport strategy
 
 // Middleware
