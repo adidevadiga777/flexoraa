@@ -132,7 +132,9 @@ async function googleCallback(req, res) {
     res.cookie("token", token);
 
     // Redirect back to frontend
-    const frontendUrl = process.env.FRONTEND_URL || "https://flexoraa-lovat.vercel.app";
+    const frontendUrl = (process.env.FRONTEND_URL && !process.env.FRONTEND_URL.includes('localhost'))
+        ? process.env.FRONTEND_URL
+        : "https://flexoraa-lovat.vercel.app";
     res.redirect(`${frontendUrl}/`);
 }
 

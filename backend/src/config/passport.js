@@ -3,12 +3,16 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const userModel = require('../models/user.model');
 require('dotenv').config();
 
+const googleCallbackUrl = (process.env.GOOGLE_CALLBACK_URL && !process.env.GOOGLE_CALLBACK_URL.includes('localhost'))
+    ? process.env.GOOGLE_CALLBACK_URL
+    : 'https://flexoraa-1.onrender.com/api/auth/google/callback';
+
 passport.use(
     new GoogleStrategy(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.GOOGLE_CALLBACK_URL || 'https://flexoraa-1.onrender.com/api/auth/google/callback',
+            callbackURL: googleCallbackUrl,
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
