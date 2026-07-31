@@ -13,6 +13,10 @@ const getPortfolioBySlug = async (req, res) => {
             return res.status(404).json({ message: 'Portfolio not found' });
         }
 
+        if (!portfolio.isPublished) {
+            return res.status(403).json({ message: 'Portfolio has not been published yet' });
+        }
+
         res.status(200).json({ portfolio });
 
     } catch (error) {
@@ -163,6 +167,7 @@ const publishPortfolio = async (req, res) => {
         }
 
         portfolio.isPublished = true;
+        await portfolio.save();
         const frontendUrl = process.env.FRONTEND_URL || 'https://flexoraa-lovat.vercel.app';
         const liveUrl = `${frontendUrl}/portfolio/${portfolio.slug}`;
         res.status(200).json({ message: 'Portfolio published successfully', portfolio, liveUrl });

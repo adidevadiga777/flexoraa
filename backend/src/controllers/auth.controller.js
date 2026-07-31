@@ -6,18 +6,22 @@ const { redis } = require('../config/cache');
 
 const getCookieOptions = () => ({
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 3 * 24 * 60 * 60 * 1000
 });
 
 async function registerUser(req, res) {
     const { username, email, password } = req.body;
 
+    if (!username || !email || !password || !username.trim() || !email.trim() || !password.trim()) {
+        return res.status(400).json({ message: "All fields are required" });
+    }
+
     const isAlreadyRegistered = await userModel.findOne({
         $or: [
-            { email },
-            { username }
+            { email: email.toLowerCase() },
+            { username: username.toLowerCase() }
         ]
     })
 
@@ -56,9 +60,13 @@ async function registerUser(req, res) {
 async function loginUser(req, res) {
     const { email, password, username } = req.body;
 
+    if (!password) {
+        return res.status(400).json({ message: "Password is required" });
+    }
+
     const query = [];
-    if (email) query.push({ email });
-    if (username) query.push({ username });
+    if (email) query.push({ email: email.toLowerCase() });
+    if (username) query.push({ username: username.toLowerCase() });
 
     if (query.length === 0) {
         return res.status(400).json({ message: "Email or username required" });
@@ -123,7 +131,12 @@ async function logoutUser(req, res) {
         try {
             await redis.set(token, Date.now().toString(), "EX", 60 * 60);
         } catch (e) {
-            console.error("Redis logout error:", e.message);
+            console.error("Redis logout error, falling back to database blacklist:", e.message);
+        }
+        try {
+            await blacklistModel.create({ token });
+        } catch (dbErr) {
+            console.error("Database blacklisting failed:", dbErr.message);
         }
     }
 
@@ -145,9 +158,7 @@ async function googleCallback(req, res) {
     res.cookie("token", token, getCookieOptions());
 
     // Redirect back to frontend with token parameter for fallback
-    const frontendUrl = (process.env.FRONTEND_URL && !process.env.FRONTEND_URL.includes('localhost'))
-        ? process.env.FRONTEND_URL
-        : "https://flexoraa-lovat.vercel.app";
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     res.redirect(`${frontendUrl}/?token=${token}`);
 }
 

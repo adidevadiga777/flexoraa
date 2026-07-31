@@ -26,7 +26,15 @@ async function authUser(req, res, next) {
                 return res.status(401).json({ message: "Invalid token" });
             }
         } catch (e) {
-            console.error("Redis blacklist check failed:", e.message);
+            console.error("Redis blacklist check failed, falling back to database check:", e.message);
+            try {
+                const isTokenInDbBlacklist = await blacklistModel.findOne({ token });
+                if (isTokenInDbBlacklist) {
+                    return res.status(401).json({ message: "Invalid token" });
+                }
+            } catch (dbErr) {
+                console.error("Database blacklist check failed:", dbErr.message);
+            }
         }
     }
 
