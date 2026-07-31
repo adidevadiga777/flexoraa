@@ -128,7 +128,9 @@ You are helping create a personal portfolio website. Given this resume data${use
 Resume data:
 ${JSON.stringify(structuredData)}
 ${userInstruction ? `\nUser instructions / preferences to apply:\n"${userInstruction}"\n` : ''}
-Return JSON in this exact schema:
+Return JSON in this exact schema. All themeColors values MUST be valid 6-digit hex color codes starting with #. fontFamily MUST be a plain font name string only (e.g. Inter, Roboto).
+
+Schema:
 {
   "tagline": "one punchy line, under 12 words, describing who they are professionally",
   "heroBio": "1 concise sentence engaging intro summary specifically for the hero section",
@@ -141,13 +143,13 @@ Return JSON in this exact schema:
     { "name": "", "description": "", "githubLink": "", "liveLink": "" }
   ],
   "themeColors": {
-    "background": "#hexcode (default is light warm off-white #F6F3EC for Classic template, or dark #0A0A0A for Modern template, but can be updated by user request)",
-    "text": "#hexcode (default is deep dark #1B1B18 for Classic template, or bone white #F5F3EE for Modern template)",
-    "primary": "#hexcode (primary accent/highlight color, e.g. terracotta #B4522B for Classic template, or lime green #D6FF3F for Modern template)",
-    "secondary": "#hexcode (secondary cards background or neutral details, e.g. surface card #151319 for Modern template)",
-    "accent": "#hexcode (extra design detail accent color, e.g. pink #FF3EC8 for Modern template)"
+    "background": "#F6F3EC",
+    "text": "#1B1B18",
+    "primary": "#B4522B",
+    "secondary": "#847F71",
+    "accent": "#DEDACD"
   },
-  "fontFamily": "font-name (e.g. 'Inter', 'Space Grotesk', 'Playfair Display', 'Lora', 'Fira Code', 'Roboto')"
+  "fontFamily": "Inter"
 }
 `;
 
@@ -155,7 +157,24 @@ Return JSON in this exact schema:
   const cleaned = cleanJsonResponse(rawText);
 
   try {
-    return JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned);
+    // Sanitize themeColors — strip any non-hex values the AI accidentally returned as descriptions
+    if (parsed.themeColors && typeof parsed.themeColors === 'object') {
+      const defaults = { background: '#F6F3EC', text: '#1B1B18', primary: '#B4522B', secondary: '#847F71', accent: '#DEDACD' };
+      for (const key of Object.keys(parsed.themeColors)) {
+        const val = String(parsed.themeColors[key] || '');
+        if (!val.match(/^#[0-9A-Fa-f]{3,6}$/)) {
+          // Try to extract a hex code from the string
+          const hexMatch = val.match(/#[0-9A-Fa-f]{3,6}/);
+          parsed.themeColors[key] = hexMatch ? hexMatch[0] : (defaults[key] || '#888888');
+        }
+      }
+    }
+    // Sanitize fontFamily — strip extra quotes/descriptions
+    if (parsed.fontFamily && typeof parsed.fontFamily === 'string') {
+      parsed.fontFamily = parsed.fontFamily.replace(/['"`()]/g, '').split(',')[0].trim();
+    }
+    return parsed;
   } catch (error) {
     console.error('Failed to parse Gemini content generation response:', cleaned);
     throw new Error('AI returned invalid JSON during content generation');
@@ -219,10 +238,27 @@ Rules:
 
   try {
     const parsed = JSON.parse(cleaned);
+    // Strip placeholder strings
     for (const k in parsed) {
       if (parsed[k] === '...' || (Array.isArray(parsed[k]) && parsed[k][0] === '...')) {
         delete parsed[k];
       }
+    }
+    // Sanitize themeColors — strip any non-hex values the AI accidentally returned as descriptions
+    if (parsed.themeColors && typeof parsed.themeColors === 'object') {
+      const existingColors = inputJson.themeColors || {};
+      const defaults = { background: '#F6F3EC', text: '#1B1B18', primary: '#B4522B', secondary: '#847F71', accent: '#DEDACD' };
+      for (const key of Object.keys(parsed.themeColors)) {
+        const val = String(parsed.themeColors[key] || '');
+        if (!val.match(/^#[0-9A-Fa-f]{3,6}$/)) {
+          const hexMatch = val.match(/#[0-9A-Fa-f]{3,6}/);
+          parsed.themeColors[key] = hexMatch ? hexMatch[0] : (existingColors[key] || defaults[key] || '#888888');
+        }
+      }
+    }
+    // Sanitize fontFamily — strip extra quotes/descriptions
+    if (parsed.fontFamily && typeof parsed.fontFamily === 'string') {
+      parsed.fontFamily = parsed.fontFamily.replace(/['"`()]/g, '').split(',')[0].trim();
     }
     return {
       ...inputJson,
