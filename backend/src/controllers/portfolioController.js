@@ -54,6 +54,81 @@ const tryLocalEditFallback = (currentPortfolioContent, instruction, currentName 
     return null;
 };
 
+const generateAiReply = (instruction, updatedContent) => {
+    const t = instruction.toLowerCase().trim();
+
+    // Name change
+    if (/\b(name|first name|last name|full name)\b/.test(t)) {
+        const newName = updatedContent?.name;
+        return newName
+            ? `Done! Your name has been updated to "${newName}". Check the preview! 🎉`
+            : `Got it! Your name has been updated. Take a look at the preview.`;
+    }
+
+    // Font changes
+    if (/\b(font|typeface|typography|bold|italic|weight)\b/.test(t)) {
+        const font = updatedContent?.fontFamily;
+        return font
+            ? `Font updated to "${font}"! It looks great — check the preview. ✍️`
+            : `Typography updated! Have a look at the preview to see the new style.`;
+    }
+
+    // Background color
+    if (/\b(background|bg|page color|backdrop)\b/.test(t)) {
+        const bg = updatedContent?.themeColors?.background;
+        return bg
+            ? `Background color changed to ${bg}. Looking fresh — check the preview! 🎨`
+            : `Background updated! Check the preview for the new look.`;
+    }
+
+    // Accent / primary / theme color
+    if (/\b(color|colour|accent|primary|theme|highlight)\b/.test(t)) {
+        return `Color scheme updated! The new palette is live in the preview. 🎨`;
+    }
+
+    // Tagline / title
+    if (/\b(tagline|headline|title|role|position)\b/.test(t)) {
+        const tagline = updatedContent?.tagline;
+        return tagline
+            ? `Tagline updated to: "${tagline}". Check the preview! 💼`
+            : `Your tagline has been refreshed. Check the preview.`;
+    }
+
+    // Bio / about
+    if (/\b(bio|about|summary|description|introduction|intro)\b/.test(t)) {
+        return `Your bio has been rewritten. It's looking sharp — check the preview! ✨`;
+    }
+
+    // Skills
+    if (/\b(skill|skills|tech|stack|tools|technologies)\b/.test(t)) {
+        return `Skills section updated! Check the preview to see the changes. 🛠️`;
+    }
+
+    // Experience
+    if (/\b(experience|job|work|career|company|role)\b/.test(t)) {
+        return `Work experience updated! Check the preview. 💼`;
+    }
+
+    // Projects
+    if (/\b(project|projects|portfolio|work|showcase)\b/.test(t)) {
+        return `Projects section updated! Check the preview. 🚀`;
+    }
+
+    // Template switch
+    if (/\b(template|design|layout|modern|classic|theme)\b/.test(t)) {
+        return `Template switched! Check the preview to see your new design. 🎨`;
+    }
+
+    // Revert / undo
+    if (/\b(old|previous|original|revert|undo|back|before)\b/.test(t)) {
+        return `Reverted! The previous version is back. Check the preview. ↩️`;
+    }
+
+    // Generic fallback with instruction echo
+    const shortInstruction = instruction.length > 60 ? instruction.slice(0, 57) + '...' : instruction;
+    return `Done! I've applied: "${shortInstruction}". Check the preview to see the changes. ✅`;
+};
+
 const editPortfolio = async (req, res) => {
     try {
         const { id } = req.params;
@@ -117,7 +192,7 @@ const editPortfolio = async (req, res) => {
             portfolio.messages = [];
         }
         portfolio.messages.push({ role: 'user', text: instruction });
-        portfolio.messages.push({ role: 'ai', text: 'Updated! Check the preview.' });
+        portfolio.messages.push({ role: 'ai', text: generateAiReply(instruction, updatedContent) });
         portfolio.markModified('messages');
 
         await portfolio.save();
