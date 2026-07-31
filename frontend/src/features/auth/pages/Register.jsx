@@ -85,7 +85,7 @@ const Register = () => {
                     <div className="w-full h-full rounded-2xl overflow-hidden bg-[#e0dbd4] relative">
                         <video
                             className="w-full h-full object-cover"
-                            src="https://ik.imagekit.io/wsp4q3lfu/Video%20Project.mp4"
+                            src="https://ik.imagekit.io/wsp4q3lfu/Video%20Project%202.mp4"
                             autoPlay loop muted playsInline
                         />
                     </div>
