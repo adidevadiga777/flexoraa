@@ -30,9 +30,22 @@ function TemplateOne({ portfolio }) {
     const firstName = nameParts[0] || '';
     const restName = nameParts.slice(1).join(' ');
 
+    // Dynamic styles and fonts setup
+    const themeColors = portfolioContent?.themeColors || {};
+    const PAPER = themeColors.background || '#F6F3EC';
+    const INK = themeColors.text || '#1B1B18';
+    const STONE = themeColors.secondary || '#847F71';
+    const CLAY = themeColors.primary || '#B4522B';
+    const HAIRLINE = themeColors.accent || '#DEDACD';
+
+    const chosenFont = portfolioContent?.fontFamily || 'Inter';
+    const headerFont = portfolioContent?.headerFontFamily || portfolioContent?.fontFamily || 'Fraunces';
+    const fontUrl = `https://fonts.googleapis.com/css2?family=${chosenFont.replace(/\s+/g, '+')}:wght@300;400;500;600;700;800;900&family=${headerFont.replace(/\s+/g, '+')}:wght@300;400;500;600;700;800;900&display=swap`;
+    const HEADER_FONT = `'${headerFont}', serif`;
+
     return (
-        <div className="min-h-screen" style={{ fontFamily: "'Inter', system-ui, sans-serif", backgroundColor: PAPER, color: INK }}>
-            <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+        <div className="min-h-screen" style={{ fontFamily: `'${chosenFont}', system-ui, sans-serif`, backgroundColor: PAPER, color: INK }}>
+            <link href={fontUrl} rel="stylesheet" />
 
             {/* ═══ HEADER ═══ */}
             <header className="max-w-4xl mx-auto px-6 sm:px-8 pt-10 pb-6 flex items-center justify-between">
@@ -57,7 +70,7 @@ function TemplateOne({ portfolio }) {
                             <span className="text-[12px] uppercase tracking-[0.18em] font-medium" style={{ color: STONE }}>Available for work</span>
                         </motion.div>
 
-                        <motion.h1 variants={fadeUp} className="leading-[1.05] mb-8" style={{ fontFamily: "'Fraunces', serif" }}>
+                        <motion.h1 variants={fadeUp} className="leading-[1.05] mb-8" style={{ fontFamily: HEADER_FONT }}>
                             <span className="block text-[15px] font-normal mb-4" style={{ fontFamily: "'Inter', sans-serif", color: STONE }}>
                                 Hello, my name is
                             </span>
@@ -161,7 +174,7 @@ function TemplateOne({ portfolio }) {
                                         <div className="flex items-baseline gap-4">
                                             <span className="text-[12px] mt-1" style={{ color: STONE }}>{String(idx + 1).padStart(2, '0')}</span>
                                             <div>
-                                                <h3 className="text-[19px] font-medium mb-2" style={{ fontFamily: "'Fraunces', serif", color: INK }}>
+                                                <h3 className="text-[19px] font-medium mb-2" style={{ fontFamily: HEADER_FONT, color: INK }}>
                                                     {proj.name}
                                                 </h3>
                                                 <p className="text-[14px] leading-relaxed max-w-md" style={{ color: '#4A4838' }}>
@@ -191,24 +204,24 @@ function TemplateOne({ portfolio }) {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 mt-2 flex-wrap">
                             <a href={`mailto:${structuredData?.email || ''}`} className="text-2xl sm:text-3xl font-medium no-underline inline-block"
-                                style={{ fontFamily: "'Fraunces', serif", color: INK, borderBottom: `1px solid ${INK}` }}>
+                                style={{ fontFamily: HEADER_FONT, color: INK, borderBottom: `1px solid ${INK}` }}>
                                 {structuredData?.email || 'hello@example.com'}
                             </a>
                             {structuredData?.phone && (
                                 <a href={`tel:${structuredData.phone}`} className="text-2xl sm:text-3xl font-medium no-underline inline-block"
-                                    style={{ fontFamily: "'Fraunces', serif", color: INK, borderBottom: `1px solid ${INK}` }}>
+                                    style={{ fontFamily: HEADER_FONT, color: INK, borderBottom: `1px solid ${INK}` }}>
                                     {structuredData.phone}
                                 </a>
                             )}
                             {structuredData?.linkedin && (
                                 <a href={structuredData.linkedin.startsWith('http') ? structuredData.linkedin : `https://${structuredData.linkedin}`} target="_blank" rel="noreferrer" className="text-2xl sm:text-3xl font-medium no-underline inline-block"
-                                    style={{ fontFamily: "'Fraunces', serif", color: INK, borderBottom: `1px solid ${INK}` }}>
+                                    style={{ fontFamily: HEADER_FONT, color: INK, borderBottom: `1px solid ${INK}` }}>
                                     LinkedIn
                                 </a>
                             )}
                             {structuredData?.github && (
                                 <a href={structuredData.github.startsWith('http') ? structuredData.github : `https://${structuredData.github}`} target="_blank" rel="noreferrer" className="text-2xl sm:text-3xl font-medium no-underline inline-block"
-                                    style={{ fontFamily: "'Fraunces', serif", color: INK, borderBottom: `1px solid ${INK}` }}>
+                                    style={{ fontFamily: HEADER_FONT, color: INK, borderBottom: `1px solid ${INK}` }}>
                                     GitHub
                                 </a>
                             )}

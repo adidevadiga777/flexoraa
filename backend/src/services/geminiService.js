@@ -141,10 +141,13 @@ Return JSON in this exact schema:
     { "name": "", "description": "", "githubLink": "", "liveLink": "" }
   ],
   "themeColors": {
-    "primary": "#hexcode",
-    "secondary": "#hexcode",  
-    "accent": "#hexcode"
-  }
+    "background": "#hexcode (default is light warm off-white #F6F3EC for Classic template, or dark #0A0A0A for Modern template, but can be updated by user request)",
+    "text": "#hexcode (default is deep dark #1B1B18 for Classic template, or bone white #F5F3EE for Modern template)",
+    "primary": "#hexcode (primary accent/highlight color, e.g. terracotta #B4522B for Classic template, or lime green #D6FF3F for Modern template)",
+    "secondary": "#hexcode (secondary cards background or neutral details, e.g. surface card #151319 for Modern template)",
+    "accent": "#hexcode (extra design detail accent color, e.g. pink #FF3EC8 for Modern template)"
+  },
+  "fontFamily": "font-name (e.g. 'Inter', 'Space Grotesk', 'Playfair Display', 'Lora', 'Fira Code', 'Roboto')"
 }
 `;
 
@@ -194,14 +197,17 @@ Schema:
     { "name": "", "description": "", "githubLink": "", "liveLink": "" }
   ],
   "themeColors": {
+    "background": "#hexcode",
+    "text": "#hexcode",
     "primary": "#hexcode",
     "secondary": "#hexcode",
     "accent": "#hexcode"
-  }
+  },
+  "fontFamily": "font-name"
 }
 
 Rules:
-- Apply ONLY the user's requested edit (e.g. name, tagline, bio, skills, experience, or projects).
+- Apply ONLY the user's requested edit (e.g. name, tagline, bio, skills, experience, projects, themeColors background/text/accent/primary/secondary, or fontFamily).
 - Keep every other existing value exactly as provided in the current portfolio content JSON unless requested otherwise.
 - Do NOT output placeholder strings like "...". Preserve existing actual content values.
 - If the instruction asks to update name, set the "name" property to the new full name requested.

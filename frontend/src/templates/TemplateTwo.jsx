@@ -40,9 +40,27 @@ function TemplateTwo({ portfolio }) {
     const yearsExp = experience.length > 0 ? `${experience.length}+` : '1+';
     const marqueeItems = [...skills, ...skills, ...skills, ...skills];
 
+    // Dynamic styles and fonts setup
+    const themeColors = portfolioContent?.themeColors || {};
+    const VOID = themeColors.background || '#0A0A0A';
+    const BONE = themeColors.text || '#F5F3EE';
+    const LIME = themeColors.primary || '#D6FF3F';
+    const PINK = themeColors.accent || '#FF3EC8';
+    
+    // Derived or specific surfaces
+    const SURFACE = themeColors.secondary || '#151319';
+    const SURFACE2 = themeColors.surfaceCard || '#1C1A22';
+    const BORDER = themeColors.border || '#2A2730';
+    const MUTED = themeColors.muted || '#8B8790';
+
+    const chosenFont = portfolioContent?.fontFamily || 'Space Grotesk';
+    const headerFont = portfolioContent?.headerFontFamily || portfolioContent?.fontFamily || 'Archivo Black';
+    const fontUrl = `https://fonts.googleapis.com/css2?family=${chosenFont.replace(/\s+/g, '+')}:wght@300;400;500;600;700;800;900&family=${headerFont.replace(/\s+/g, '+')}:wght@300;400;500;600;700;800;900&display=swap`;
+    const HEADER_FONT = `'${headerFont}', sans-serif`;
+
     return (
-        <div className="min-h-screen relative overflow-x-hidden" style={{ fontFamily: "'Space Grotesk', system-ui, sans-serif", backgroundColor: VOID, color: BONE }}>
-            <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Archivo+Black&display=swap" rel="stylesheet" />
+        <div className="min-h-screen relative overflow-x-hidden" style={{ fontFamily: `'${chosenFont}', system-ui, sans-serif`, backgroundColor: VOID, color: BONE }}>
+            <link href={fontUrl} rel="stylesheet" />
             <style>{`
                 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
                 .marquee-track { animation: marquee 22s linear infinite; }
@@ -57,7 +75,7 @@ function TemplateTwo({ portfolio }) {
                 <div className="max-w-6xl mx-auto flex items-center justify-between px-5 sm:px-8 py-4">
                     <a href="#" className="flex items-center gap-2.5 no-underline">
                         <div className="w-9 h-9 flex items-center justify-center rounded-md" style={{ backgroundColor: LIME, boxShadow: glowShadow(`${LIME}55`, 0, 0, 16) }}>
-                            <span className="font-black text-sm" style={{ fontFamily: "'Archivo Black', sans-serif", color: VOID }}>{firstName.charAt(0)}</span>
+                            <span className="font-black text-sm" style={{ fontFamily: HEADER_FONT, color: VOID }}>{firstName.charAt(0)}</span>
                         </div>
                         <span className="text-[15px] font-bold tracking-tight" style={{ color: BONE }}>{displayName}</span>
                     </a>
@@ -91,9 +109,9 @@ function TemplateTwo({ portfolio }) {
                             </motion.div>
                             <motion.h1 variants={fadeUp} className="leading-[0.95]">
                                 <span className="block text-lg sm:text-xl font-medium mb-2" style={{ color: MUTED }}>Hey, I'm</span>
-                                <span className="block text-6xl sm:text-7xl lg:text-8xl" style={{ fontFamily: "'Archivo Black', sans-serif", color: BONE }}>{firstName}</span>
+                                <span className="block text-6xl sm:text-7xl lg:text-8xl" style={{ fontFamily: HEADER_FONT, color: BONE }}>{firstName}</span>
                                 {restName && (
-                                    <span className="block text-6xl sm:text-7xl lg:text-8xl" style={{ fontFamily: "'Archivo Black', sans-serif", color: LIME }}>{restName}</span>
+                                    <span className="block text-6xl sm:text-7xl lg:text-8xl" style={{ fontFamily: HEADER_FONT, color: LIME }}>{restName}</span>
                                 )}
                             </motion.h1>
                             <motion.p variants={fadeUp} className="text-lg sm:text-xl font-semibold max-w-lg" style={{ color: BONE }}>{tagline}</motion.p>
@@ -111,7 +129,7 @@ function TemplateTwo({ portfolio }) {
                             <motion.div variants={fadeUp} className="flex gap-3 pt-6 flex-wrap">
                                 {[{ label: 'Projects', value: projects.length || '3' }, { label: 'Skills', value: skills.length }, { label: 'Years', value: yearsExp }].map((stat, i) => (
                                     <div key={stat.label} className="px-4 py-3 rounded-md" style={{ backgroundColor: SURFACE, border: `1px solid ${BORDER}`, boxShadow: glowShadow(i === 1 ? `${PINK}22` : `${LIME}22`, 0, 0, 14) }}>
-                                        <div className="text-xl font-black" style={{ fontFamily: "'Archivo Black', sans-serif", color: i === 1 ? PINK : LIME }}>{stat.value}</div>
+                                        <div className="text-xl font-black" style={{ fontFamily: HEADER_FONT, color: i === 1 ? PINK : LIME }}>{stat.value}</div>
                                         <div className="text-[10px] font-bold uppercase tracking-wide" style={{ color: MUTED }}>{stat.label}</div>
                                     </div>
                                 ))}
@@ -138,7 +156,7 @@ function TemplateTwo({ portfolio }) {
                     <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl p-8 sm:p-12" style={{ backgroundColor: SURFACE, border: `1px solid ${BORDER}` }}>
                         <div className="flex items-center gap-3 pb-6 mb-6" style={{ borderBottom: `1px solid ${BORDER}` }}>
                             <User className="w-5 h-5" style={{ color: LIME }} />
-                            <h2 className="text-2xl font-black" style={{ fontFamily: "'Archivo Black', sans-serif", color: BONE }}>About Me</h2>
+                            <h2 className="text-2xl font-black" style={{ fontFamily: HEADER_FONT, color: BONE }}>About Me</h2>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                             <p className="md:col-span-8 text-base sm:text-lg leading-relaxed" style={{ color: MUTED }}>{aboutBio}</p>
@@ -171,7 +189,7 @@ function TemplateTwo({ portfolio }) {
 
                 <section id="skills" className="scroll-mt-20 max-w-6xl mx-auto px-5 sm:px-8 pb-24">
                     <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-7">
-                        <div className="flex items-center gap-3"><Code2 className="w-5 h-5" style={{ color: LIME }} /><h2 className="text-2xl font-black" style={{ fontFamily: "'Archivo Black', sans-serif", color: BONE }}>Skills</h2></div>
+                        <div className="flex items-center gap-3"><Code2 className="w-5 h-5" style={{ color: LIME }} /><h2 className="text-2xl font-black" style={{ fontFamily: HEADER_FONT, color: BONE }}>Skills</h2></div>
                         <div className="flex flex-wrap gap-3">
                             {skills.map((skill, idx) => {
                                 const accent = idx % 3 === 0 ? LIME : idx % 3 === 1 ? PINK : BONE;
@@ -187,7 +205,7 @@ function TemplateTwo({ portfolio }) {
 
                 <section id="projects" className="scroll-mt-20 max-w-6xl mx-auto px-5 sm:px-8 pb-24">
                     <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-7">
-                        <div className="flex items-center gap-3"><Briefcase className="w-5 h-5" style={{ color: PINK }} /><h2 className="text-2xl font-black" style={{ fontFamily: "'Archivo Black', sans-serif", color: BONE }}>Featured Work</h2></div>
+                        <div className="flex items-center gap-3"><Briefcase className="w-5 h-5" style={{ color: PINK }} /><h2 className="text-2xl font-black" style={{ fontFamily: HEADER_FONT, color: BONE }}>Featured Work</h2></div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {projects.map((proj, idx) => (
                                 <motion.div key={idx} whileHover={{ y: -4 }} className="rounded-xl p-6 sm:p-7 flex flex-col justify-between transition-all" style={{ backgroundColor: SURFACE, border: `1px solid ${BORDER}`, boxShadow: glowShadow(idx % 2 === 0 ? `${LIME}22` : `${PINK}22`, 0, 8, 30) }}>
@@ -196,7 +214,7 @@ function TemplateTwo({ portfolio }) {
                                             <span style={{ color: MUTED }}>PROJECT {String(idx + 1).padStart(2, '0')}</span>
                                             <span className="px-2 py-0.5 rounded" style={{ backgroundColor: `${LIME}1A`, color: LIME }}>DONE</span>
                                         </div>
-                                        <h3 className="text-xl font-black" style={{ fontFamily: "'Archivo Black', sans-serif", color: BONE }}>{proj.name}</h3>
+                                        <h3 className="text-xl font-black" style={{ fontFamily: HEADER_FONT, color: BONE }}>{proj.name}</h3>
                                         <p className="text-[13px] leading-relaxed" style={{ color: MUTED }}>{proj.description || proj.achievementDescription}</p>
                                     </div>
                                     <div className="flex items-center gap-4 pt-4 mt-4 text-[12px] font-bold" style={{ borderTop: `1px solid ${BORDER}` }}>
@@ -212,7 +230,7 @@ function TemplateTwo({ portfolio }) {
 
             <section id="contact" className="scroll-mt-20 max-w-6xl mx-auto px-5 sm:px-8 pb-24 pt-10 text-center">
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-7">
-                    <h2 className="text-4xl sm:text-6xl font-black mb-6" style={{ fontFamily: "'Archivo Black', sans-serif", color: BONE }}>Let's Work Together</h2>
+                    <h2 className="text-4xl sm:text-6xl font-black mb-6" style={{ fontFamily: HEADER_FONT, color: BONE }}>Let's Work Together</h2>
                     <p className="text-lg mb-8 max-w-md mx-auto" style={{ color: MUTED }}>
                         Currently open to new roles and freelance work.
                     </p>
