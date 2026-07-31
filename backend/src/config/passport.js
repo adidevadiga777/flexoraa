@@ -3,7 +3,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const userModel = require('../models/user.model');
 require('dotenv').config();
 
-const googleCallbackUrl = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/api/auth/google/callback';
+const googleCallbackUrl = process.env.GOOGLE_CALLBACK_URL || 'https://flexoraa-1.onrender.com/api/auth/google/callback';
 
 passport.use(
     new GoogleStrategy(
