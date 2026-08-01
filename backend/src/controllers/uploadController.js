@@ -1,5 +1,5 @@
 const { extractTextFromPDF } = require('../services/resumeParser');
-const { extractResumeData, generatePortfolioContent } = require('../services/geminiService');
+const { extractResumeData, generatePortfolioContent } = require('../services/groqService');
 const Portfolio = require('../models/Portfolio');
 const { uploadImageToImageKit } = require('../services/imageService');
 const generateSlug = require('../utils/generateSlug');

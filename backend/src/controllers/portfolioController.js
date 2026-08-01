@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Portfolio = require('../models/Portfolio');
-const { editPortfolioContent } = require('../services/geminiService');
+const { editPortfolioContent } = require('../services/groqService');
 const generateSlug = require('../utils/generateSlug');
 
 const getPortfolioBySlug = async (req, res) => {
@@ -32,7 +32,7 @@ const tryLocalEditFallback = (currentPortfolioContent, instruction, currentName 
 
     // Match name change instructions: e.g. "change first last to aditya devadiga", "change name to John Doe", "my name is Jane"
     const nameMatch = text.match(/(?:change|update|set)\s+(?:my\s+)?(?:first\s*last|name|full\s*name)\s+(?:to|=)\s+["']?([^"'.]+)["']?/i) ||
-                      text.match(/my\s+name\s+is\s+["']?([^"'.]+)["']?/i);
+        text.match(/my\s+name\s+is\s+["']?([^"'.]+)["']?/i);
     if (nameMatch && nameMatch[1]) {
         const rawName = nameMatch[1].trim();
         const formattedName = rawName.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
