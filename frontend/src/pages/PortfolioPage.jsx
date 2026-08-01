@@ -2,6 +2,7 @@ import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import { templates } from '../templates';
 import { API_BASE_URL } from '../config';
+import LoadingScreen from '../components/LoadingScreen';
 
 function PortfolioPage() {
     const { slug } = useParams();
@@ -26,7 +27,7 @@ function PortfolioPage() {
         fetchPortfolio();
     }, [slug]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <LoadingScreen />;
     if (error) return <div>Error: {error}</div>;
 
     const SelectedTemplate = portfolio
