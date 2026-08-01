@@ -46,7 +46,7 @@ function TemplateTwo({ portfolio }) {
     const BONE = themeColors.text || '#F5F3EE';
     const LIME = themeColors.primary || '#D6FF3F';
     const PINK = themeColors.accent || '#FF3EC8';
-    
+
     // Derived or specific surfaces
     const SURFACE = themeColors.secondary || '#151319';
     const SURFACE2 = themeColors.surfaceCard || '#1C1A22';
@@ -109,9 +109,9 @@ function TemplateTwo({ portfolio }) {
                             </motion.div>
                             <motion.h1 variants={fadeUp} className="leading-[0.95]">
                                 <span className="block text-lg sm:text-xl font-medium mb-2" style={{ color: MUTED }}>Hey, I'm</span>
-                                <span className="block text-6xl sm:text-7xl lg:text-8xl" style={{ fontFamily: HEADER_FONT, color: BONE }}>{firstName}</span>
+                                <span className="block text-6xl sm:text-7xl lg:text-8xl fontWeight: 700" style={{ fontFamily: HEADER_FONT, color: BONE }}>{firstName}</span>
                                 {restName && (
-                                    <span className="block text-6xl sm:text-7xl lg:text-8xl" style={{ fontFamily: HEADER_FONT, color: LIME }}>{restName}</span>
+                                    <span className="block text-6xl sm:text-7xl lg:text-8xl fontWeight: 700" style={{ fontFamily: HEADER_FONT, color: LIME }}>{restName}</span>
                                 )}
                             </motion.h1>
                             <motion.p variants={fadeUp} className="text-lg sm:text-xl font-semibold max-w-lg" style={{ color: BONE }}>{tagline}</motion.p>

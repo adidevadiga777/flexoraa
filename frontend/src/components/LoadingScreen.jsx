@@ -63,7 +63,7 @@ export default function LoadingScreen() {
 
                 {/* Brand Name */}
                 <motion.h1
-                    className="text-[20px] font-bold text-[#1a1a1a] tracking-[0.15em] uppercase mb-3"
+                    className="text-[20px] font-bold text-[#1a1a1a] tracking-[0.15em] mb-3"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
