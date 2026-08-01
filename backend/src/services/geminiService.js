@@ -171,17 +171,15 @@ Schema:
     { "name": "", "description": "", "githubLink": "", "liveLink": "" }
   ],
   "themeColors": {
-    "background": "#F6F3EC",
-    "text": "#1B1B18",
-    "primary": "#B4522B",
-    "secondary": "#847F71",
-    "accent": "#DEDACD"
+    "background": "",
+    "text": "",
+    "primary": "",
+    "secondary": "",
+    "accent": ""
   },
   "fontFamily": "Inter"
 }
-
-IMPORTANT: The hex codes and font name shown above are ONLY to illustrate the JSON structure — they are not a suggestion. Do NOT reuse "#F6F3EC", "#1B1B18", "#B4522B", "#847F71", "#DEDACD", or "Inter" unless you have a genuine reason tied to this specific person's field or seniority. Choose an original palette and font pairing that fits the tone of THIS resume — e.g. a backend/infra engineer might suit cooler, muted tones; a designer or frontend-leaning profile might suit something bolder or warmer. Vary your choice from resume to resume rather than defaulting to the same "safe" palette every time.
-`;
+`
 
   const rawText = await generateWithFallback(prompt, { temperature: 0.9 });
   const cleaned = cleanJsonResponse(rawText);
