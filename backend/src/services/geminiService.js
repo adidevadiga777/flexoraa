@@ -3,17 +3,12 @@ const Groq = require('groq-sdk');
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 // Candidate models list to try in sequence in case of model availability or rate limits (429).
-// Both are current Groq "production" tier models (not preview — those can be pulled with no notice).
-// Trying a second model on 429 also helps because Groq enforces rate limits PER MODEL,
-// so a cap on gpt-oss-120b doesn't affect gpt-oss-20b's separate quota.
 const CANDIDATE_MODELS = [
   'openai/gpt-oss-120b',
   'openai/gpt-oss-20b',
 ];
 
 // --- Simple in-memory throttle -------------------------------------------
-// Groq's free tier is ~30 requests/minute per model. Spacing calls out reduces
-// how often you trip 429 in the first place, instead of just reacting to it after.
 const MIN_INTERVAL_MS = 2100;
 let lastCallAt = 0;
 
@@ -29,8 +24,6 @@ const throttle = async () => {
 };
 // ---------------------------------------------------------------------------
 
-// Helper: some models still wrap JSON in markdown code fences or stray text —
-// kept as a safety net even though response_format: json_object should prevent it.
 const cleanJsonResponse = (text) => {
   if (!text) return '';
   let cleaned = text
@@ -46,7 +39,6 @@ const cleanJsonResponse = (text) => {
   return cleaned;
 };
 
-// Exponential backoff with jitter: 1.5s, 3s, 6s (+/- up to 500ms random jitter)
 const backoffDelay = (attempt) => 1500 * 2 ** (attempt - 1) + Math.random() * 500;
 
 const generateWithFallback = async (prompt, generationConfig = null) => {
@@ -76,7 +68,7 @@ const generateWithFallback = async (prompt, generationConfig = null) => {
 
         if (isNotFound) {
           console.warn(`Groq model '${modelName}' not found or decommissioned (404). Skipping to next model...`);
-          break; // dead model — no point retrying, move to next candidate
+          break;
         }
 
         if (isQuotaError) {
@@ -149,6 +141,17 @@ IMPORTANT: Only use text that literally appears in the resume above. If a field 
 };
 
 // CALL 2: Turn structured data into polished portfolio content
+//
+// NOTE: themeColors / fontFamily are intentionally NOT part of this schema.
+// Every template component (TemplateOne, TemplateTwo, and any future ones)
+// already has its own hardcoded, hand-designed default palette that applies
+// whenever portfolioContent.themeColors is absent — e.g.:
+//   const PAPER = themeColors.background || '#F6F3EC';   // TemplateOne
+//   const VOID  = themeColors.background || '#0A0A0A';   // TemplateTwo
+// By never generating themeColors here, first-time generation always
+// renders each template's intended look, regardless of which template
+// the user picked. Colors only become editable later, explicitly, via
+// editPortfolioContent — see that function below.
 const generatePortfolioContent = async (structuredData, userInstruction = '') => {
   const prompt = `
 You are helping create a personal portfolio website. Given this resume data${userInstruction ? ` and user preference: "${userInstruction}"` : ''}, generate polished, achievement-focused portfolio content as ONLY valid JSON. No explanation, no markdown — just the JSON object.
@@ -156,7 +159,7 @@ You are helping create a personal portfolio website. Given this resume data${use
 Resume data:
 ${JSON.stringify(structuredData)}
 ${userInstruction ? `\nUser instructions / preferences to apply:\n"${userInstruction}"\n` : ''}
-Return JSON in this exact schema. All themeColors values MUST be valid 6-digit hex color codes starting with #. fontFamily MUST be a plain font name string only (e.g. Inter, Roboto).
+Return JSON in this exact schema.
 
 Schema:
 {
@@ -169,15 +172,7 @@ Schema:
   ],
   "polishedProjects": [
     { "name": "", "description": "", "githubLink": "", "liveLink": "" }
-  ],
-  "themeColors": {
-    "background": "",
-    "text": "",
-    "primary": "",
-    "secondary": "",
-    "accent": ""
-  },
-  "fontFamily": "Inter"
+  ]
 }
 `
 
@@ -186,22 +181,8 @@ Schema:
 
   try {
     const parsed = JSON.parse(cleaned);
-    // Sanitize themeColors — strip any non-hex values the AI accidentally returned as descriptions
-    if (parsed.themeColors && typeof parsed.themeColors === 'object') {
-      const defaults = { background: '#F6F3EC', text: '#1B1B18', primary: '#B4522B', secondary: '#847F71', accent: '#DEDACD' };
-      for (const key of Object.keys(parsed.themeColors)) {
-        const val = String(parsed.themeColors[key] || '');
-        if (!val.match(/^#[0-9A-Fa-f]{3,6}$/)) {
-          // Try to extract a hex code from the string
-          const hexMatch = val.match(/#[0-9A-Fa-f]{3,6}/);
-          parsed.themeColors[key] = hexMatch ? hexMatch[0] : (defaults[key] || '#888888');
-        }
-      }
-    }
-    // Sanitize fontFamily — strip extra quotes/descriptions
-    if (parsed.fontFamily && typeof parsed.fontFamily === 'string') {
-      parsed.fontFamily = parsed.fontFamily.replace(/['"`()]/g, '').split(',')[0].trim();
-    }
+    // No themeColors/fontFamily handling needed — they're simply absent,
+    // so every template falls back to its own built-in design.
     return parsed;
   } catch (error) {
     console.error('Failed to parse Groq content generation response:', cleaned);
@@ -210,6 +191,17 @@ Schema:
 };
 
 // CALL 3: Edit existing portfolio content based on user instruction
+//
+// themeColors/fontFamily stay in this schema — this is the ONLY place a
+// user can change the look, by explicitly asking for it (e.g. "make the
+// accent blue", "give it a lighter background").
+//
+// Template-agnostic by design: this function doesn't know or care which
+// template the portfolio uses. It only ever reads/writes whatever colors
+// already exist on THIS portfolio (inputJson.themeColors). If the AI
+// returns a malformed value with no usable existing fallback either, the
+// key is simply omitted from the result — letting the active template's
+// own hardcoded default apply, exactly as it does on first generation.
 const editPortfolioContent = async (currentPortfolioContent, instruction, currentName = '') => {
   const cleanContent = currentPortfolioContent
     ? JSON.parse(JSON.stringify(currentPortfolioContent))
@@ -259,6 +251,7 @@ Rules:
 - Do NOT output placeholder strings like "...". Preserve existing actual content values.
 - If the instruction asks to update name, set the "name" property to the new full name requested.
 - Never invent or alter githubLink/liveLink unless the instruction specifically asks you to.
+- Only include "themeColors" or "fontFamily" in your response if the user's instruction actually asked to change colors, theme, or font. Otherwise omit them entirely so existing values are preserved untouched.
 `;
 
   const rawText = await generateWithFallback(prompt, { temperature: 0.2 });
@@ -266,28 +259,44 @@ Rules:
 
   try {
     const parsed = JSON.parse(cleaned);
+
     // Strip placeholder strings
     for (const k in parsed) {
       if (parsed[k] === '...' || (Array.isArray(parsed[k]) && parsed[k][0] === '...')) {
         delete parsed[k];
       }
     }
-    // Sanitize themeColors — strip any non-hex values the AI accidentally returned as descriptions
+
+    // Sanitize themeColors — strip any non-hex values the AI accidentally
+    // returned as descriptions. Template-agnostic: prefer this portfolio's
+    // OWN existing color for that key; if there isn't one, drop the key
+    // entirely so the active template's own hardcoded default takes over.
     if (parsed.themeColors && typeof parsed.themeColors === 'object') {
       const existingColors = inputJson.themeColors || {};
-      const defaults = { background: '#F6F3EC', text: '#1B1B18', primary: '#B4522B', secondary: '#847F71', accent: '#DEDACD' };
       for (const key of Object.keys(parsed.themeColors)) {
         const val = String(parsed.themeColors[key] || '');
         if (!val.match(/^#[0-9A-Fa-f]{3,6}$/)) {
           const hexMatch = val.match(/#[0-9A-Fa-f]{3,6}/);
-          parsed.themeColors[key] = hexMatch ? hexMatch[0] : (existingColors[key] || defaults[key] || '#888888');
+          if (hexMatch) {
+            parsed.themeColors[key] = hexMatch[0];
+          } else if (existingColors[key]) {
+            parsed.themeColors[key] = existingColors[key];
+          } else {
+            delete parsed.themeColors[key];
+          }
         }
       }
+      // If every key ended up dropped, remove the empty object entirely
+      if (Object.keys(parsed.themeColors).length === 0) {
+        delete parsed.themeColors;
+      }
     }
+
     // Sanitize fontFamily — strip extra quotes/descriptions
     if (parsed.fontFamily && typeof parsed.fontFamily === 'string') {
       parsed.fontFamily = parsed.fontFamily.replace(/['"`()]/g, '').split(',')[0].trim();
     }
+
     return {
       ...inputJson,
       ...parsed
