@@ -109,9 +109,9 @@ function TemplateTwo({ portfolio }) {
                             </motion.div>
                             <motion.h1 variants={fadeUp} className="leading-[0.95]">
                                 <span className="block text-lg sm:text-xl font-medium mb-2" style={{ color: MUTED }}>Hey, I'm</span>
-                                <span className="block text-6xl sm:text-7xl lg:text-8xl fontWeight: 700" style={{ fontFamily: HEADER_FONT, color: BONE }}>{firstName}</span>
+                                <span className="block text-6xl sm:text-7xl lg:text-8xl fontWeight: 900" style={{ fontFamily: HEADER_FONT, color: BONE }}>{firstName}</span>
                                 {restName && (
-                                    <span className="block text-6xl sm:text-7xl lg:text-8xl fontWeight: 700" style={{ fontFamily: HEADER_FONT, color: LIME }}>{restName}</span>
+                                    <span className="block text-6xl sm:text-7xl lg:text-8xl fontWeight: 900" style={{ fontFamily: HEADER_FONT, color: LIME }}>{restName}</span>
                                 )}
                             </motion.h1>
                             <motion.p variants={fadeUp} className="text-lg sm:text-xl font-semibold max-w-lg" style={{ color: BONE }}>{tagline}</motion.p>
