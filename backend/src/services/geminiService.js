@@ -4,9 +4,9 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Candidate models list to try in sequence in case of model availability or rate limits (429)
 const CANDIDATE_MODELS = [
-  'gemini-flash-latest',   // auto-tracks the newest stable Flash model — best default
-  'gemini-2.5-flash',      // may still work depending on your account/region, kept as fallback
-  'gemini-2.5-flash-lite'  // cheaper/faster fallback if the above are rate-limited
+  'gemini-2.0-flash',       // stable, widely available — primary choice
+  'gemini-1.5-flash',       // proven fallback, works on all API key tiers
+  'gemini-1.5-flash-8b'     // lightest fallback if above are rate-limited
 ];
 
 // Helper: Gemini sometimes wraps JSON in markdown code fences or text — strip that
