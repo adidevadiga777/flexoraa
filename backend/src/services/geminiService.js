@@ -1,15 +1,36 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Groq = require('groq-sdk');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// Candidate models list to try in sequence in case of model availability or rate limits (429)
+// Candidate models list to try in sequence in case of model availability or rate limits (429).
+// Both are current Groq "production" tier models (not preview — those can be pulled with no notice).
+// Trying a second model on 429 also helps because Groq enforces rate limits PER MODEL,
+// so a cap on gpt-oss-120b doesn't affect gpt-oss-20b's separate quota.
 const CANDIDATE_MODELS = [
-  'gemini-2.5-flash',
-  'gemini-2.5-flash-lite',
-  'gemini-2.0-flash',
+  'openai/gpt-oss-120b',
+  'openai/gpt-oss-20b',
 ];
 
-// Helper: Gemini sometimes wraps JSON in markdown code fences or text — strip that
+// --- Simple in-memory throttle -------------------------------------------
+// Groq's free tier is ~30 requests/minute per model. Spacing calls out reduces
+// how often you trip 429 in the first place, instead of just reacting to it after.
+const MIN_INTERVAL_MS = 2100;
+let lastCallAt = 0;
+
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+
+const throttle = async () => {
+  const now = Date.now();
+  const wait = lastCallAt + MIN_INTERVAL_MS - now;
+  if (wait > 0) {
+    await sleep(wait);
+  }
+  lastCallAt = Date.now();
+};
+// ---------------------------------------------------------------------------
+
+// Helper: some models still wrap JSON in markdown code fences or stray text —
+// kept as a safety net even though response_format: json_object should prevent it.
 const cleanJsonResponse = (text) => {
   if (!text) return '';
   let cleaned = text
@@ -25,46 +46,51 @@ const cleanJsonResponse = (text) => {
   return cleaned;
 };
 
-const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+// Exponential backoff with jitter: 1.5s, 3s, 6s (+/- up to 500ms random jitter)
+const backoffDelay = (attempt) => 1500 * 2 ** (attempt - 1) + Math.random() * 500;
 
 const generateWithFallback = async (prompt, generationConfig = null) => {
   let lastError = null;
   let hitQuotaLimit = false;
 
   for (const modelName of CANDIDATE_MODELS) {
-    const modelParams = { model: modelName };
-    if (generationConfig && Object.keys(generationConfig).length > 0) {
-      modelParams.generationConfig = generationConfig;
-    }
-    const model = genAI.getGenerativeModel(modelParams);
-
-    for (let attempt = 1; attempt <= 2; attempt++) {
+    const maxAttempts = 3;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        const result = await model.generateContent(prompt);
-        return result.response.text();
+        await throttle();
+        const completion = await groq.chat.completions.create({
+          model: modelName,
+          messages: [{ role: 'user', content: prompt }],
+          response_format: { type: 'json_object' },
+          ...(generationConfig?.temperature !== undefined
+            ? { temperature: generationConfig.temperature }
+            : {}),
+        });
+        return completion.choices[0].message.content;
       } catch (err) {
         lastError = err;
+        const status = err.status || err?.response?.status;
         const msg = (err.message || '').toLowerCase();
-        const isQuotaError = msg.includes('429') || msg.includes('quota') || msg.includes('resource_exhausted');
-        const isNotFound = msg.includes('404') || msg.includes('not found');
+        const isQuotaError = status === 429 || msg.includes('429') || msg.includes('quota') || msg.includes('rate limit');
+        const isNotFound = status === 404 || msg.includes('404') || msg.includes('not found') || msg.includes('decommissioned');
 
         if (isNotFound) {
-          console.warn(`Gemini model '${modelName}' not found (404). Skipping to next model...`);
-          break;
+          console.warn(`Groq model '${modelName}' not found or decommissioned (404). Skipping to next model...`);
+          break; // dead model — no point retrying, move to next candidate
         }
 
         if (isQuotaError) {
           hitQuotaLimit = true;
-          if (attempt < 2) {
-            console.warn(`Gemini model '${modelName}' hit rate limit (429). Retrying in 1.5s...`);
-            await sleep(1500);
+          if (attempt < maxAttempts) {
+            const wait = backoffDelay(attempt);
+            console.warn(`Groq model '${modelName}' hit rate limit (429). Retrying in ${(wait / 1000).toFixed(1)}s...`);
+            await sleep(wait);
           } else {
-            console.warn(`Gemini model '${modelName}' quota limit reached. Pausing 1.5s and trying next model...`);
-            await sleep(1500);
+            console.warn(`Groq model '${modelName}' quota limit reached after ${maxAttempts} attempts. Trying next model...`);
             break;
           }
         } else {
-          console.warn(`Gemini model '${modelName}' failed (attempt ${attempt}): ${err.message}`);
+          console.warn(`Groq model '${modelName}' failed (attempt ${attempt}): ${err.message}`);
           break;
         }
       }
@@ -72,10 +98,10 @@ const generateWithFallback = async (prompt, generationConfig = null) => {
   }
 
   if (hitQuotaLimit) {
-    throw new Error('Gemini API rate limit reached (429). Please wait a few seconds and try again.');
+    throw new Error('Groq API rate limit reached (429). Please wait a few seconds and try again.');
   }
 
-  throw lastError || new Error('All Gemini candidate models failed.');
+  throw lastError || new Error('All Groq candidate models failed.');
 };
 
 // CALL 1: Extract structured data from raw resume text
@@ -115,7 +141,7 @@ ${resumeText}
   try {
     return JSON.parse(cleaned);
   } catch (error) {
-    console.error('Failed to parse Gemini extraction response:', cleaned);
+    console.error('Failed to parse Groq extraction response:', cleaned);
     throw new Error('AI returned invalid JSON during extraction');
   }
 };
@@ -176,7 +202,7 @@ Schema:
     }
     return parsed;
   } catch (error) {
-    console.error('Failed to parse Gemini content generation response:', cleaned);
+    console.error('Failed to parse Groq content generation response:', cleaned);
     throw new Error('AI returned invalid JSON during content generation');
   }
 };
@@ -265,7 +291,7 @@ Rules:
       ...parsed
     };
   } catch (error) {
-    console.error('Failed to parse Gemini edit response:', cleaned, 'Error:', error);
+    console.error('Failed to parse Groq edit response:', cleaned, 'Error:', error);
     throw new Error('AI returned invalid JSON during content edit: ' + error.message);
   }
 };
