@@ -11,6 +11,30 @@ const getCookieOptions = () => ({
     maxAge: 3 * 24 * 60 * 60 * 1000
 });
 
+const getFrontendBaseUrl = (req) => {
+    const configuredFrontendUrl = process.env.FRONTEND_URL?.trim();
+    if (configuredFrontendUrl) {
+        return configuredFrontendUrl.replace(/\/$/, '');
+    }
+
+    const forwardedProto = req.get('x-forwarded-proto') || req.protocol || 'https';
+    const forwardedHost = req.get('x-forwarded-host') || req.get('host');
+    if (forwardedHost) {
+        return `${forwardedProto}://${forwardedHost}`;
+    }
+
+    const origin = req.get('origin') || req.get('referer');
+    if (origin) {
+        try {
+            return new URL(origin).origin;
+        } catch (error) {
+            console.warn('Unable to parse origin for frontend redirect:', error.message);
+        }
+    }
+
+    return 'https://www.flexoraa.in';
+};
+
 async function registerUser(req, res) {
     const { username, email, password } = req.body;
 
@@ -158,7 +182,7 @@ async function googleCallback(req, res) {
     res.cookie("token", token, getCookieOptions());
 
     // Redirect back to frontend with token parameter for fallback
-    const frontendUrl = process.env.FRONTEND_URL || "https://www.flexoraa.in";
+    const frontendUrl = getFrontendBaseUrl(req);
     res.redirect(`${frontendUrl}/?token=${token}`);
 }
 
@@ -167,5 +191,6 @@ module.exports = {
     loginUser,
     getMe,
     logoutUser,
-    googleCallback
+    googleCallback,
+    getFrontendBaseUrl
 }
