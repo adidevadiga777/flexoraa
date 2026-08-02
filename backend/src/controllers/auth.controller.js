@@ -158,7 +158,7 @@ async function googleCallback(req, res) {
     res.cookie("token", token, getCookieOptions());
 
     // Redirect back to frontend with token parameter for fallback
-    const frontendUrl = process.env.FRONTEND_URL || "https://flexoraa-lovat.vercel.app";
+    const frontendUrl = process.env.FRONTEND_URL || "https://www.flexoraa.in";
     res.redirect(`${frontendUrl}/?token=${token}`);
 }
 

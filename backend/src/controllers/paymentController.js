@@ -25,7 +25,7 @@ const createOrder = async (req, res) => {
 
         // If already paid, return status
         if (portfolio.isPaid && portfolio.isPublished && portfolio.slug) {
-            const frontendUrl = process.env.FRONTEND_URL || 'https://flexoraa-lovat.vercel.app';
+            const frontendUrl = process.env.FRONTEND_URL || 'https://www.flexoraa.in';
             const liveUrl = `${frontendUrl}/portfolio/${portfolio.slug}`;
             return res.status(200).json({
                 alreadyPaid: true,
@@ -95,7 +95,7 @@ const verifyPayment = async (req, res) => {
         portfolio.isPublished = true;
         await portfolio.save();
 
-        const frontendUrl = process.env.FRONTEND_URL || 'https://flexoraa-lovat.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://www.flexoraa.in';
         const liveUrl = `${frontendUrl}/portfolio/${portfolio.slug}`;
 
         res.status(200).json({

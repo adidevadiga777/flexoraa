@@ -10,7 +10,7 @@ router.post('/login', authController.loginUser)
 router.get("/get-me", authMiddleware.authUser, authController.getMe)
 router.get("/logout", authMiddleware.authUser, authController.logoutUser)
 
-const frontendUrl = process.env.FRONTEND_URL || 'https://flexoraa-lovat.vercel.app';
+const frontendUrl = process.env.FRONTEND_URL || 'https://www.flexoraa.in';
 
 // Google OAuth routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))

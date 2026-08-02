@@ -17,7 +17,7 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 const allowedOrigins = [
     process.env.FRONTEND_URL,
-    "https://flexoraa-lovat.vercel.app",
+    "https://www.flexoraa.in",
     "http://localhost:5173"
 
 ].filter(Boolean);

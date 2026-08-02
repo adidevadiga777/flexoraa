@@ -243,7 +243,7 @@ const publishPortfolio = async (req, res) => {
 
         portfolio.isPublished = true;
         await portfolio.save();
-        const frontendUrl = process.env.FRONTEND_URL || 'https://flexoraa-lovat.vercel.app';
+        const frontendUrl = process.env.FRONTEND_URL || 'https://www.flexoraa.in';
         const liveUrl = `${frontendUrl}/portfolio/${portfolio.slug}`;
         res.status(200).json({ message: 'Portfolio published successfully', portfolio, liveUrl });
 
