@@ -35,7 +35,7 @@ const createOrder = async (req, res) => {
             });
         }
 
-        const amountInPaise = 200; // ₹69.00 = 6900 paise
+        const amountInPaise = 100; // ₹69.00 = 6900 paise
 
         const options = {
             amount: amountInPaise,
