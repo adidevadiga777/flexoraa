@@ -146,13 +146,6 @@ const Login = () => {
                                     }
                                 </button>
                             </div>
-
-                            <div className="flex justify-end">
-                                <a href="#" className="text-[13px] text-[#6b6b6b] hover:text-[#1a1a1a] transition-colors">
-                                    Forgot password?
-                                </a>
-                            </div>
-
                             <button
                                 type="submit"
                                 disabled={loading}
