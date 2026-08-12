@@ -8,7 +8,7 @@ const portfolioRoutes = require('./routes/portfolioRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 
 const app = express();
-require('./config/passport'); // Initialize passport strategy
+require('./config/passport');
 
 // Middleware
 app.use(express.json());

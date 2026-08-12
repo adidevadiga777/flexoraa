@@ -16,7 +16,7 @@ function UploadForm() {
         const formData = new FormData();
         formData.append('resume', resume);
         formData.append('image', image);
-        formData.append('selectedTemplate', template); // NEW
+        formData.append('selectedTemplate', template);
 
         setLoading(true);
         try {

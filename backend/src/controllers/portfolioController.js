@@ -30,7 +30,6 @@ const tryLocalEditFallback = (currentPortfolioContent, instruction, currentName 
     const cleanContent = currentPortfolioContent ? JSON.parse(JSON.stringify(currentPortfolioContent)) : {};
     const text = instruction.trim();
 
-    // Match name change instructions: e.g. "change first last to aditya devadiga", "change name to John Doe", "my name is Jane"
     const nameMatch = text.match(/(?:change|update|set)\s+(?:my\s+)?(?:first\s*last|name|full\s*name)\s+(?:to|=)\s+["']?([^"'.]+)["']?/i) ||
         text.match(/my\s+name\s+is\s+["']?([^"'.]+)["']?/i);
     if (nameMatch && nameMatch[1]) {
@@ -42,7 +41,6 @@ const tryLocalEditFallback = (currentPortfolioContent, instruction, currentName 
         };
     }
 
-    // Match tagline / title change instructions: e.g. "change title to Full Stack Engineer"
     const taglineMatch = text.match(/(?:change|update|set)\s+(?:my\s+)?(?:title|tagline|role|headline)\s+(?:to|=)\s+["']?([^"'.]+)["']?/i);
     if (taglineMatch && taglineMatch[1]) {
         return {
@@ -156,7 +154,7 @@ const editPortfolio = async (req, res) => {
         const currentName = portfolio.portfolioContent?.name || portfolio.structuredData?.name || '';
         let updatedContent = null;
 
-        // First attempt AI edit via Gemini, fallback to instant parser if rate limited (429)
+        // First attempt AI edit via Groq, fallback to instant parser if rate limited (429)
         try {
             updatedContent = await editPortfolioContent(portfolio.portfolioContent, instruction, currentName);
         } catch (err) {

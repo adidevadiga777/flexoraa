@@ -3,10 +3,10 @@ const generateSlug = (name) => {
     const base = strName
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9]+/g, '-')   // replace spaces/special chars with hyphens
-        .replace(/^-+|-+$/g, '');       // trim leading/trailing hyphens
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
 
-    const randomSuffix = Math.random().toString(36).substring(2, 7); // short random string
+    const randomSuffix = Math.random().toString(36).substring(2, 7);
     return `${base || 'portfolio'}-${randomSuffix}`;
 };
 
