@@ -6,6 +6,7 @@ const cors = require("cors")
 const uploadRoutes = require('./routes/uploadRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const { CANDIDATE_MODELS: GROQ_MODELS } = require('./services/groqService');
 
 const app = express();
 require('./config/passport');
@@ -35,6 +36,10 @@ app.use('/api', uploadRoutes);
 app.use('/api', portfolioRoutes);
 
 app.use('/api/payment', paymentRoutes);
+
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'online', provider: 'Groq', models: GROQ_MODELS });
+});
 
 // Global Error Handler Middleware
 app.use((err, req, res, next) => {

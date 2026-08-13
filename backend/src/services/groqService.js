@@ -277,4 +277,4 @@ Rules:
   }
 };
 
-module.exports = { extractResumeData, generatePortfolioContent, editPortfolioContent };
+module.exports = { extractResumeData, generatePortfolioContent, editPortfolioContent, CANDIDATE_MODELS };
