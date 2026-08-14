@@ -342,23 +342,21 @@ function Home() {
                                                 {!portfolio && (
                                                     <>
                                                         {/* Resume pill */}
-                                                        <button
-                                                            onClick={() => resumeInputRef.current.click()}
-                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors ${resume ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'bg-[#f5f0eb] text-[#6b6b6b] border-[#d4d0cb] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'}`}
+                                                        <label
+                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors cursor-pointer ${resume ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'bg-[#f5f0eb] text-[#6b6b6b] border-[#d4d0cb] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'}`}
                                                         >
                                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                                                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                                                 <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                                             </svg>
                                                             {resume ? resume.name.slice(0, 14) + (resume.name.length > 14 ? '…' : '') : 'Resume'}
-                                                        </button>
-                                                        <input ref={resumeInputRef} type="file" accept="application/pdf" className="hidden"
-                                                            onChange={(e) => setResume(e.target.files[0])} />
+                                                            <input type="file" accept="application/pdf,.pdf" className="hidden"
+                                                                onChange={(e) => e.target.files?.[0] && setResume(e.target.files[0])} />
+                                                        </label>
 
                                                         {/* Photo pill */}
-                                                        <button
-                                                            onClick={() => imageInputRef.current.click()}
-                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors ${image ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'bg-[#f5f0eb] text-[#6b6b6b] border-[#d4d0cb] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'}`}
+                                                        <label
+                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors cursor-pointer ${image ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'bg-[#f5f0eb] text-[#6b6b6b] border-[#d4d0cb] hover:border-[#1a1a1a] hover:text-[#1a1a1a]'}`}
                                                         >
                                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
                                                                 <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
@@ -366,9 +364,9 @@ function Home() {
                                                                 <polyline points="21,15 16,10 5,21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                                             </svg>
                                                             {image ? image.name.slice(0, 14) + (image.name.length > 14 ? '…' : '') : 'Photo'}
-                                                        </button>
-                                                        <input ref={imageInputRef} type="file" accept="image/*" className="hidden"
-                                                            onChange={(e) => setImage(e.target.files[0])} />
+                                                            <input type="file" accept="image/*,.heic,.heif,.png,.jpg,.jpeg,.webp" className="hidden"
+                                                                onChange={(e) => e.target.files?.[0] && setImage(e.target.files[0])} />
+                                                        </label>
                                                     </>
                                                 )}
                                             </div>

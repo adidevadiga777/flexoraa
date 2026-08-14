@@ -53,8 +53,8 @@ function UploadForm() {
                 </div>
             </div>
 
-            <input type="file" accept="application/pdf" onChange={(e) => setResume(e.target.files[0])} />
-            <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0])} />
+            <input type="file" accept="application/pdf,.pdf" onChange={(e) => e.target.files?.[0] && setResume(e.target.files[0])} />
+            <input type="file" accept="image/*,.heic,.heif,.png,.jpg,.jpeg,.webp" onChange={(e) => e.target.files?.[0] && setImage(e.target.files[0])} />
             <button type="submit" disabled={loading}>{loading ? 'Generating...' : 'Generate Portfolio'}</button>
         </form>
     );
