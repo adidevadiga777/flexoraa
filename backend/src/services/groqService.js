@@ -236,7 +236,6 @@ Rules:
 
   try {
     const parsed = JSON.parse(cleaned);
-    s
     for (const k in parsed) {
       if (parsed[k] === '...' || (Array.isArray(parsed[k]) && parsed[k][0] === '...')) {
         delete parsed[k];
